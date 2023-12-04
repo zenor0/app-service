@@ -11,6 +11,7 @@ from app.api.v2.goods.models import Good
 from app.api.v2.wallets.models import Wallet
 from app.api.v2.issues.models import Issue
 from app.api.v2.orders.models import Order
+from app.api.v2.carts.models import Cart
 
 import sqlalchemy
 import os
@@ -81,6 +82,11 @@ class FakeGenerator:
                 'state': random.choice(Order.ORDER_STATE_ENUM),
                 'create_time': self.generate_fake_date(),
                 'pay_time': self.generate_fake_date(),
+            })
+            
+            Cart().from_dict({
+                'user_id': random.randint(1, count),
+                'goods_id': random.randint(1, count),
             })
             
         logging.info('Generated {} fake goods'.format(count))

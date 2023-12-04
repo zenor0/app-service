@@ -39,6 +39,9 @@ api.register_blueprint(issues_blueprint, url_prefix='/issues')
 from .orders import orders as orders_blueprint
 api.register_blueprint(orders_blueprint, url_prefix='/orders')
 
+from .carts import carts as carts_blueprint
+api.register_blueprint(carts_blueprint, url_prefix='/carts')
+
 
 
 
