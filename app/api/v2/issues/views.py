@@ -13,7 +13,7 @@ from flask_restful import Resource, Api
 issueApi = Api(issues)
 
 class Issues(Resource):
-    method_decorators = [jwt_required()]
+    # method_decorators = [jwt_required()]
     def get(self, issue_id):
         issue_info = Issue.query.filter_by(issue_id=issue_id).first()
 

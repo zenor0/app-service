@@ -29,7 +29,7 @@ def login():
     return BaseResponse(data=user_info.to_dict()).dict()
 
 
-@auth.route("/", methods=["GET"])
+@auth.route("/register", methods=["POST"])
 def register():
     if 'application/json' not in request.content_type:
         return BaseResponse(code=400, message='content type must be application/json').dict()
