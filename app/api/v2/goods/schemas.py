@@ -25,9 +25,9 @@ class UpdateGoodForm(BaseModel):
 
 class CreateGoodForm(BaseModel):
     seller_id: int
-    state: str
-    game: str
+    # state: str
+    # game: str
     title: str
     detail: str
     price: float
-    publish_time: str
+    # publish_time: str

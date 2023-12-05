@@ -43,7 +43,7 @@ class Order(db.Model, BaseModel):
     from_id = Column(Integer, nullable=False)
     to_id = Column(Integer, nullable=False)
     good_id = Column(Integer, nullable=False)
-    state = Column(Enum(*ORDER_STATE_ENUM), nullable=False, default=ORDER_STATE_ENUM[0])
+    state = Column(Enum(*ORDER_STATE_ENUM_DESCRIPTION), nullable=False, default=ORDER_STATE_ENUM_DESCRIPTION[0])
     price = Column(DECIMAL(10, 2))
     create_time = Column(DateTime, nullable=False, default=datetime.utcnow)
     pay_time = Column(DateTime)
@@ -58,7 +58,7 @@ class Order(db.Model, BaseModel):
             'from_id': self.from_id,
             'to_id': self.to_id,
             'good_id': self.good_id,
-            'state': self.ORDER_STATE_ENUM_DESCRIPTION[int(self.state)-1],
+            'state': self.state,
             'price': float(self.price),
             'create_time': datetime.isoformat(self.create_time, sep=' '),
             'pay_time': datetime.isoformat(self.pay_time, sep=' '),

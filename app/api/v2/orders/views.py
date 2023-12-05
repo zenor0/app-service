@@ -1,6 +1,8 @@
 from flask import request
 from . import orders
 from .models import Order
+from ..goods.models import Good
+from ..carts.models import Cart
 from sqlalchemy import and_, extract, func
 from sqlalchemy.sql import text
 
@@ -61,3 +63,56 @@ def get_order_stats():
         last_month_amount_array.append(sum([j.price for j in order_list_last_month if j.create_time.day == i]))
         
     return BaseResponse(data={'this_month': this_month_amount_array, 'last_month': last_month_amount_array}).dict()
+
+
+@orders.route('/<int:user_id>/<int:goods_id>', methods=['POST'])
+def create_order(goods_id, user_id):
+    goods_info = Good.query.filter_by(good_id=goods_id).first()
+    if not goods_info:
+        return BaseResponse(code=404, message='商品不存在').dict()
+
+    if goods_info.state != Good.GOOD_STATES_ENUM_DESCRIPTION[1]:
+        return BaseResponse(code=400, message='商品不可购买').dict()
+    
+    create_order = Order().from_dict({
+        'from_id': goods_info.seller_id,
+        'to_id': user_id,
+        'good_id': goods_id,
+        'price': goods_info.price,
+        'state': Order.ORDER_STATE_ENUM[0],
+        'create_time': datetime.now(),
+        'pay_time': datetime.now(),
+    })
+    
+    goods_info.state = Good.GOOD_STATES_ENUM_DESCRIPTION[3]
+
+    from ..carts.views import delete_cart
+    delete_cart(user_id, goods_id)
+
+    return BaseResponse(data=create_order.to_dict()).dict()
+
+
+@orders.route('/<int:user_id>/all', methods=['POST'])
+def buy_all(user_id):
+    goods_list = Cart.query.filter_by(user_id=user_id).all()
+    resp_list = []
+    for i in goods_list:
+        good_info = Good.query.filter_by(good_id=i.goods_id).first()
+        create_order = Order().from_dict({
+            'from_id': good_info.seller_id,
+            'to_id': user_id,
+            'good_id': i.goods_id,
+            'price': good_info.price,
+            'state': Order.ORDER_STATE_ENUM[0],
+            'create_time': datetime.now(),
+            'pay_time': datetime.now(),
+        })
+        good_info.state = Good.GOOD_STATES_ENUM_DESCRIPTION[3]
+        resp_list.append(good_info)
+        
+        from ..carts.views import delete_cart
+        delete_cart(user_id, good_info.good_id)
+        
+
+    
+    return BaseResponse(data={'goods' :[i.to_dict() for i in resp_list]}).dict()

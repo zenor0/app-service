@@ -41,12 +41,12 @@ class Good(db.Model, BaseModel):
     GOOD_STATES_ENUM = ['01', '02', '03', '04', '05', '06', '07']
     good_id = Column('uid', Integer, primary_key=True)
     seller_id = Column(Integer, nullable=False)
-    state = Column(Enum(*GOOD_STATES_ENUM), nullable=False, default=GOOD_STATES_ENUM[0])
-    game = Column(String(256))
+    state = Column(Enum(*GOOD_STATES_ENUM_DESCRIPTION), nullable=False, default=GOOD_STATES_ENUM_DESCRIPTION[0])
+    game = Column(String(256), default='Normal')
     title = Column(String(256))
     detail = Column(String(1024))
     price = Column(DECIMAL(10, 2))
-    publish_time = Column(DateTime)
+    publish_time = Column(DateTime, default=datetime.utcnow)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -58,7 +58,7 @@ class Good(db.Model, BaseModel):
         return {
             'uid': self.good_id,
             'seller_id': self.seller_id,
-            'state': self.GOOD_STATES_ENUM_DESCRIPTION[int(self.state)-1],
+            'state': self.state,
             'game': self.game,
             'title': self.title,
             'detail': self.detail,

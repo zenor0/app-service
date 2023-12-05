@@ -36,12 +36,17 @@ class Issue(db.Model, BaseModel):
     
     ISSUE_STATE_ENUM = ['pending', 'ongoing', 'closed']
     issue_id = Column(Integer, primary_key=True)
-    seller_id = Column(Integer, nullable=False)
-    buyer_id = Column(Integer, nullable=False)
+    # seller_id = Column(Integer, nullable=False)
+    # buyer_id = Column(Integer, nullable=False)
+    order_id = Column(Integer, nullable=False)
     accuser_id = Column(Integer, nullable=False)
     reason = Column(String(256))
-    order_id = Column(Integer, nullable=False)
     create_time = Column(DateTime, nullable=False, default=datetime.utcnow)
+    
+    
+    ISSUE_TYPE_ENUM = ['report', 'refund', 'others']
+    issue_type = Column('type', Enum(*ISSUE_TYPE_ENUM), nullable=False, default=ISSUE_TYPE_ENUM[0])
+    
     
     JUDGE_RESULT_ENUM = ['seller', 'buyer', 'both', 'none']
     judge_result = Column(Enum(*JUDGE_RESULT_ENUM), default=JUDGE_RESULT_ENUM[3])
@@ -56,8 +61,9 @@ class Issue(db.Model, BaseModel):
     def to_dict(self):
         return {
             'issue_id': self.issue_id,
-            'seller_id': self.seller_id,
-            'buyer_id': self.buyer_id,
+            # 'seller_id': self.seller_id,
+            # 'buyer_id': self.buyer_id,
+            'type': self.issue_type, 
             'accuser_id': self.accuser_id,
             'reason': self.reason,
             'order_id': self.order_id,
