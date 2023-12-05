@@ -25,7 +25,7 @@ class Carts(Resource):
 
 cartApi.add_resource(Carts, '/<int:user_id>')
 
-@carts.route('/<int:user_id>/<int:goods_id>', methods=['PUT'])
+@carts.route('/<int:user_id>/<int:goods_id>', methods=['POST'])
 def add_cart(user_id, goods_id):
     result = Cart().from_dict({'user_id': user_id, 'goods_id': goods_id})
     
@@ -35,7 +35,7 @@ def add_cart(user_id, goods_id):
     return BaseResponse(data=result.to_dict()).dict()
     
     
-@carts.route('/<int:user_id>/<int:goods_id>', methods=['DELETE'])
+@carts.route('/<int:user_id>/<int:goods_id>/delete', methods=['POST'])
 def delete_cart(user_id, goods_id):
 
     result = Cart.query.filter_by(user_id=user_id, goods_id=goods_id).first()
