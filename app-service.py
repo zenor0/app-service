@@ -32,9 +32,10 @@ def clean_db():
 
 
 @app.cli.command()
-def fill_db():
+@click.argument('count')
+def fill_db(count):
     from utils.db_generator import FakeGenerator
-    FakeGenerator().start(count=1000)
+    FakeGenerator().start(count=int(count))
 
 
 if __name__ == '__main__':

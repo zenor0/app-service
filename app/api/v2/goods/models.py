@@ -47,6 +47,7 @@ class Good(db.Model, BaseModel):
     detail = Column(String(1024))
     price = Column(DECIMAL(10, 2))
     publish_time = Column(DateTime, default=datetime.utcnow)
+    img_id = Column(String(256), default='default.png')
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -63,7 +64,8 @@ class Good(db.Model, BaseModel):
             'title': self.title,
             'detail': self.detail,
             'price': float(self.price),
-            'publish_time': time
+            'publish_time': time,
+            'img_id': self.img_id,
             }
         
 

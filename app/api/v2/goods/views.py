@@ -101,10 +101,12 @@ goodsApi.add_resource(GoodsList, '/')
 
 @goods.route('/<int:good_id>/img', methods=['GET'])
 def get_good_img(good_id):
-    # if not Good.query.filter_by(good_id=good_id).first():
-    #     return BaseResponse(code=404, message='good not found').dict()
+    good_info =  Good.query.filter_by(good_id=good_id).first()
+    if good_info == None:
+        return BaseResponse(code=404, message='good not found').dict()
+    
 
-    return BaseResponse(data={'img': "http://dummyimage.com/200x200"}).dict()
+    return BaseResponse(data={'img': good_info.img_id}).dict()
 
 @goods.route('/<int:good_id>/imgmap', methods=['GET'])
 def get_good_imgmap(good_id):
@@ -136,6 +138,48 @@ def add_good():
     result = Good().from_dict(dict(createForm))
 
     return BaseResponse(data=result.to_dict()).dict()
+
+from werkzeug.utils import secure_filename
+from flask import send_file
+import os
+from hashlib import md5
+
+import io
+
+UPLOAD_FOLDER = './uploads/imgs'
+FILE_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+
+def check_file_extension(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in FILE_EXTENSIONS
+
+def generate_img_id():
+    return md5(str(datetime.utcnow()).encode('utf-8')).hexdigest()
+
+@goods.route('/uploadImg', methods=['POST'])
+def upload_img():
+    if 'file' not in request.files:
+        return BaseResponse(code=400, message='file not found').dict()
+    
+    file = request.files['file']
+    if file.filename == None or file.filename == '':
+        return BaseResponse(code=400, message='file not found').dict()
+    if file and check_file_extension(file.filename):
+        filename = generate_img_id() + '.' + secure_filename(file.filename).rsplit('.', 1)[1].lower()
+        file.save(os.path.join(UPLOAD_FOLDER, filename))
+        return BaseResponse(data={'img_id': filename}).dict()
+    else:
+        return BaseResponse(code=400, message='file type not supported').dict()
+    
+@goods.route('/img/<string:img_id>', methods=['GET'])
+def get_img(img_id):
+    if not os.path.isfile(os.path.join(UPLOAD_FOLDER, img_id)):
+        return BaseResponse(code=404, message='img not found').dict()
+
+    return send_file(io.FileIO(os.path.join(UPLOAD_FOLDER, img_id)), mimetype='image/jpeg')
+
+
+
 
 @goods.route('/<int:good_id>/update', methods=['POST'])
 # @jwt_required()

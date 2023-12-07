@@ -25,6 +25,7 @@ class UpdateGoodForm(BaseModel):
 
 class CreateGoodForm(BaseModel):
     seller_id: int
+    img_id: str
     # state: str
     # game: str
     title: str
